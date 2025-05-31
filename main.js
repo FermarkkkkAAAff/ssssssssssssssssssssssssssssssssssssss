@@ -1,89 +1,65 @@
 const tableBody = document.querySelector("#results tbody");
-let allData = [];
+let allItems = [];
 
 async function fetchLinks() {
-  try {
-    const res = await fetch("links.txt");
-    const links = (await res.text()).split("\n").filter(l => l.trim().startsWith("http"));
-    for (const link of links) {
-      await loadSheetData(link.trim());
-    }
-    renderTable();
-  } catch (e) {
-    console.error("Chyba při načítání links.txt:", e);
+  const res = await fetch("links.txt");
+  const links = (await res.text()).split("\n").map(l => l.trim()).filter(l => l.startsWith("http"));
+  for (const link of links) {
+    await loadCSV(link);
   }
+  document.getElementById("loading").style.display = "none";
+  renderTable();
 }
 
-async function loadSheetData(csvUrl) {
+async function loadCSV(url) {
   try {
-    const response = await fetch(csvUrl);
-    const text = await response.text();
-    const rows = text.split("\n").map(r => r.split(","));
+    const res = await fetch(url);
+    const text = await res.text();
+    const rows = text.split("\n").map(r => r.split(",").map(cell => cell.trim()));
 
-    const headers = rows[0].map(h => h.trim().toLowerCase());
-    const nameIdx = headers.findIndex(h => h.includes("název"));
-    const priceIdx = headers.findIndex(h => h.includes("kaobuy"));
-    const atfIdx = headers.findIndex(h => h.includes("atf"));
+    if (rows.length < 2) return;
+
+    const headers = rows[0].map(h => h.toLowerCase());
+
+    const nameIdx = headers.findIndex(h => h.includes("název") || h.includes("name") || h.includes("produkt"));
+    const priceIdx = headers.findIndex(h => h.includes("cena") || h.includes("price") || h.includes("kaobuy"));
+    const imageIdx = headers.findIndex(h => h.includes("obrázek") || h.includes("img") || h.includes("image"));
+    const linkIdx = headers.findIndex(h => h.includes("odkaz") || h.includes("link") || h.includes("url"));
 
     if (nameIdx === -1) return;
 
     rows.slice(1).forEach(row => {
-      const name = row[nameIdx]?.trim();
+      const name = row[nameIdx] || "";
       if (!name) return;
-
-      const priceLink = row[priceIdx]?.trim();
-      const atf = row[atfIdx]?.trim().toLowerCase();
-
-      const found = allData.find(item => item.name === name);
-      if (found) {
-        found.sheets.push(csvUrl);
-      } else {
-        allData.push({ name, priceLink, atf, sheets: [csvUrl] });
-      }
+      allItems.push({
+        name,
+        image: imageIdx !== -1 ? row[imageIdx] : "",
+        price: priceIdx !== -1 ? row[priceIdx] : "",
+        link: linkIdx !== -1 ? row[linkIdx] : ""
+      });
     });
-  } catch (e) {
-    console.error("Chyba při načítání CSV:", csvUrl, e);
+  } catch (err) {
+    console.error("Chyba při načítání CSV:", url, err);
   }
 }
 
 function renderTable() {
-  const search = document.getElementById("search").value.toLowerCase();
-  const filter = document.getElementById("atfFilter").value;
+  const query = document.getElementById("search").value.toLowerCase();
   tableBody.innerHTML = "";
 
-  for (const item of allData) {
-    if (search && !item.name.toLowerCase().includes(search)) continue;
-    if (filter && item.atf !== filter) continue;
-
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${item.name}</td>
-      <td>${item.priceLink ? `<a href="${item.priceLink}" target="_blank">Zobrazit</a>` : ""}</td>
-      <td>${item.sheets.length}</td>
-      <td>${item.atf || ""}</td>
-    `;
-    tableBody.appendChild(row);
-  }
-}
-
-function sortTable(colIndex) {
-  const keys = ["name", "priceLink", "sheets", "atf"];
-  const key = keys[colIndex];
-  const asc = !sortTable[`asc_${colIndex}`];
-  sortTable[`asc_${colIndex}`] = asc;
-
-  allData.sort((a, b) => {
-    const aVal = key === "sheets" ? a.sheets.length : (a[key] || "");
-    const bVal = key === "sheets" ? b.sheets.length : (b[key] || "");
-    return asc
-      ? aVal.toString().localeCompare(bVal.toString())
-      : bVal.toString().localeCompare(aVal.toString());
-  });
-
-  renderTable();
+  allItems
+    .filter(item => item.name.toLowerCase().includes(query))
+    .forEach(item => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${item.name}</td>
+        <td>${item.image ? `<img src="${item.image}" alt="obrázek">` : ""}</td>
+        <td>${item.price}</td>
+        <td>${item.link ? `<a href="${item.link}" target="_blank" class="button">Zobrazit</a>` : ""}</td>
+      `;
+      tableBody.appendChild(row);
+    });
 }
 
 document.getElementById("search").addEventListener("input", renderTable);
-document.getElementById("atfFilter").addEventListener("change", renderTable);
-
 fetchLinks();
