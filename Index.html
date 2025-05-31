@@ -1,31 +1,37 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vyhledávač produktů (Google Sheets)</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Vyhledávač produktů</title>
+  <style>
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { cursor: pointer; background-color: #eee; }
+    input, select { margin: 10px 0; padding: 5px; }
+  </style>
 </head>
 <body>
-  <h1>Vyhledávač produktů</h1>
-  <input type="text" id="search" placeholder="Hledat produkt..." />
+  <h1>Vyhledávač produktů z Google Sheets</h1>
+  <input type="text" id="search" placeholder="Hledat podle názvu">
   <select id="atfFilter">
     <option value="">Všechny ATF</option>
     <option value="ano">Ano</option>
     <option value="ne">Ne</option>
   </select>
+
   <table id="results">
     <thead>
       <tr>
         <th onclick="sortTable(0)">Název</th>
         <th onclick="sortTable(1)">Kaobuy</th>
-        <th onclick="sortTable(2)">Výskyt</th>
+        <th onclick="sortTable(2)">Počet sheetů</th>
         <th onclick="sortTable(3)">ATF</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
-  <script src="script.js"></script>
+
+  <script src="main.js"></script>
 </body>
 </html>
 
