@@ -1,0 +1,27 @@
+body {
+  font-family: sans-serif;
+  padding: 20px;
+}
+h1 {
+  margin-bottom: 15px;
+}
+input, select {
+  padding: 8px;
+  margin-bottom: 10px;
+  margin-right: 10px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th {
+  cursor: pointer;
+  background-color: #f0f0f0;
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+a {
+  color: blue;
+}
