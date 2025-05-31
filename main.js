@@ -4,8 +4,7 @@ let allData = [];
 async function fetchLinks() {
   try {
     const res = await fetch("links.txt");
-    const text = await res.text();
-    const links = text.split("\n").filter(l => l.trim().startsWith("http"));
+    const links = (await res.text()).split("\n").filter(l => l.trim().startsWith("http"));
     for (const link of links) {
       await loadSheetData(link.trim());
     }
@@ -26,10 +25,7 @@ async function loadSheetData(csvUrl) {
     const priceIdx = headers.findIndex(h => h.includes("kaobuy"));
     const atfIdx = headers.findIndex(h => h.includes("atf"));
 
-    if (nameIdx === -1) {
-      console.warn("Sloupec 'název' nebyl nalezen v:", csvUrl);
-      return;
-    }
+    if (nameIdx === -1) return;
 
     rows.slice(1).forEach(row => {
       const name = row[nameIdx]?.trim();
