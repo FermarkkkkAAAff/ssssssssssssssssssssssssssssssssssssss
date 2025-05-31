@@ -2,26 +2,22 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Vyhledávač produktů</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
     <h1>📦 Vyhledávač produktů</h1>
-    <input type="text" id="search" placeholder="🔍 Hledat název produktu">
-    <select id="atfFilter">
-      <option value="">Všechny ATF</option>
-      <option value="ano">Ano</option>
-      <option value="ne">Ne</option>
-    </select>
+    <input type="text" id="search" placeholder="Hledat...">
+    <div id="loading">⏳ Načítám data...</div>
     <table id="results">
       <thead>
         <tr>
-          <th onclick="sortTable(0)">Název</th>
-          <th onclick="sortTable(1)">Odkaz</th>
-          <th onclick="sortTable(2)">Počet zdrojů</th>
-          <th onclick="sortTable(3)">ATF</th>
+          <th>Název</th>
+          <th>Obrázek</th>
+          <th>Cena</th>
+          <th>Odkaz</th>
         </tr>
       </thead>
       <tbody></tbody>
